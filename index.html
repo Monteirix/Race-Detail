@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoDetail Premium Studio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--bg4:#22222f;
+  --border:#2a2a3a;--border2:#353548;
+  --text:#f0f0f8;--text2:#9090a8;--text3:#606078;
+  --accent:#3b82f6;--accent2:#60a5fa;
+  --gold:#d4a84b;--gold2:#f0c060;
+  --success:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;line-height:1.5;overflow:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh}
+.sidebar{width:220px;min-width:220px;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── SIDEBAR ── */
+.logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border)}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon svg{color:#fff}
+.logo-name{font-size:15px;font-weight:600}
+.logo-sub{font-size:10px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase}
+.nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.nav-section-label{font-size:10px;color:var(--text2);letter-spacing:1.2px;text-transform:uppercase;padding:10px 10px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;transition:all .15s;border:none;background:transparent;width:100%;text-align:left;border-left:2px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,.15);color:var(--accent2);border-left-color:var(--accent)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 7px;border-radius:20px}
+.sidebar-footer{padding:10px;border-top:1px solid var(--border)}
+.user-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;border:none;background:transparent;width:100%;transition:.15s}
+.user-btn:hover{background:var(--bg3)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.avatar-lg{width:56px;height:56px;font-size:18px;border:2px solid var(--gold)}
+.user-name{font-size:12px;font-weight:500;color:var(--text);text-align:left}
+.user-plan{font-size:10px;color:var(--gold);text-align:left}
+
+/* ── TOPBAR ── */
+.topbar{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2)}
+.page-title{font-size:18px;font-weight:600}
+.page-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{background:var(--bg4)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-gold{background:rgba(212,168,75,.15);border-color:var(--gold);color:var(--gold)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;position:relative}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--danger);border-radius:50%}
+
+/* ── SCREENS ── */
+.screen{display:none;animation:fadeIn .2s ease-out}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600}
+.card-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.stat-icon svg{width:16px;height:16px}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:600;margin-bottom:3px}
+.stat-sub{font-size:11px}
+.ic-blue{background:rgba(59,130,246,.15);color:var(--accent2)}
+.ic-gold{background:rgba(212,168,75,.15);color:var(--gold)}
+.ic-green{background:rgba(34,197,94,.15);color:var(--success)}
+.ic-purple{background:rgba(168,85,247,.15);color:#c084fc}
+
+/* ── NEXT APPOINTMENT ── */
+.next-appt{background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(29,78,216,.04));border:1px solid rgba(59,130,246,.25);border-radius:16px;padding:20px;margin-bottom:20px;cursor:pointer;transition:.15s}
+.next-appt:hover{filter:brightness(1.08)}
+.appt-label{font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.appt-service{font-size:17px;font-weight:600;margin-bottom:4px}
+.appt-vehicle{font-size:12px;color:var(--accent2);display:flex;align-items:center;gap:5px}
+.appt-details{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.appt-detail{background:rgba(255,255,255,.04);border-radius:8px;padding:10px}
+.detail-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.detail-value{font-size:13px;font-weight:500}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500}
+.badge-success{background:rgba(34,197,94,.1);color:var(--success);border:1px solid rgba(34,197,94,.2)}
+.badge-warning{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--accent2);border:1px solid rgba(59,130,246,.3)}
+.badge-gold{background:rgba(212,168,75,.2);color:var(--gold);border:1px solid rgba(212,168,75,.3)}
+.badge-gray{background:rgba(180,178,169,.1);color:var(--text2);border:1px solid var(--border)}
+
+/* ── SERVICE LIST ── */
+.svc-list{display:flex;flex-direction:column;gap:6px}
+.svc-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+.svc-left{display:flex;align-items:center;gap:10px}
+.svc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.svc-name{font-size:12px;font-weight:500}
+.svc-date{font-size:11px;color:var(--text2)}
+.svc-right{display:flex;align-items:center;gap:8px}
+.svc-val{font-size:12px;font-weight:500}
+
+/* ── LOYALTY ── */
+.loyalty-card{background:linear-gradient(135deg,rgba(212,168,75,.1),rgba(212,168,75,.03));border:1px solid rgba(212,168,75,.25);border-radius:12px;padding:18px}
+.loy-title{font-size:13px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.loy-sub{font-size:12px;color:var(--text2);margin-bottom:10px}
+.loy-bar-bg{background:var(--bg3);border-radius:20px;height:6px;margin-bottom:8px;overflow:hidden}
+.loy-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:20px;width:72%}
+.loy-pts{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:14px}
+.loy-divider{border:none;border-top:1px solid rgba(212,168,75,.2);margin:14px 0}
+.loy-benefits-title{font-size:11px;color:var(--text2);margin-bottom:8px}
+.loy-benefit{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--gold);margin-bottom:5px}
+.check-icon{color:var(--success)}
+
+/* ── DASHBOARD ROW ── */
+.dash-row{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-month{font-size:14px;font-weight:600}
+.cal-btns{display:flex;gap:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal-head{font-size:10px;color:var(--text2);padding:4px 0}
+.cal-day{padding:6px 2px;font-size:12px;border-radius:6px;cursor:pointer;transition:.15s;background:transparent;border:none;color:var(--text);width:100%}
+.cal-day:hover:not(.empty){background:var(--bg3)}
+.cal-day.empty{visibility:hidden;cursor:default}
+.cal-day.has-appt{background:rgba(59,130,246,.15);color:var(--accent2)}
+.cal-day.today{background:var(--accent);color:#fff;font-weight:600}
+.cal-legend{display:flex;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.cal-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* ── FORM ── */
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.form-control{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:12px;outline:none;transition:.15s}
+.form-control:focus{border-color:var(--accent)}
+select.form-control option{background:var(--bg3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.time-slots{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.time-slot{padding:6px 13px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);font-size:12px;cursor:pointer;transition:.15s;color:var(--text2)}
+.time-slot:hover:not(.busy){border-color:var(--accent);color:var(--accent2)}
+.time-slot.sel{background:rgba(59,130,246,.2);border-color:var(--accent);color:var(--accent2)}
+.time-slot.busy{opacity:.35;cursor:not-allowed}
+.form-divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+/* ── SERVICES CATALOG ── */
+.svc-catalog{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0}
+.svc-cat-item{padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.svc-cat-item:hover{filter:brightness(1.1)}
+.svc-cat-item.selected{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.3);transform:translateY(-1px)}
+.svc-cat-icon{font-size:22px;margin-bottom:8px;display:block}
+.svc-cat-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.svc-cat-desc{font-size:11px;color:var(--text2);margin-bottom:10px}
+.svc-cat-price{font-size:15px;font-weight:600;color:var(--gold)}
+.svc-selected-bar{display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-top:4px;border-top:1px solid var(--border)}
+
+/* ── VEHICLES ── */
+.veh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.veh-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s}
+.veh-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.veh-img{height:100px;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:36px;border-bottom:1px solid var(--border)}
+.veh-body{padding:12px}
+.veh-name{font-size:13px;font-weight:600;margin-bottom:5px}
+.veh-plate{font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:4px;font-family:monospace;color:var(--text2);display:inline-block;margin-bottom:8px}
+.veh-tags{display:flex;flex-wrap:wrap;gap:5px}
+.veh-tag{font-size:10px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:2px 8px;border-radius:20px}
+.veh-add{border:1px dashed var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;min-height:165px;cursor:pointer;border-radius:12px;transition:.15s;width:100%}
+.veh-add:hover{opacity:.7}
+.veh-add-inner{text-align:center;color:var(--text2)}
+.veh-add-inner span{display:block;font-size:28px;margin-bottom:6px}
+.veh-add-inner small{font-size:12px}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:16px;padding-bottom:24px}
+.tl-item:last-child{padding-bottom:0}
+.tl-left{display:flex;flex-direction:column;align-items:center;min-width:40px}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tl-dot-blue{background:rgba(59,130,246,.15);color:var(--accent2);border:1px solid rgba(59,130,246,.3)}
+.tl-dot-gold{background:rgba(212,168,75,.15);color:var(--gold);border:1px solid rgba(212,168,75,.3)}
+.tl-dot-green{background:rgba(34,197,94,.1);color:var(--success);border:1px solid rgba(34,197,94,.3)}
+.tl-line{width:1px;background:var(--border);flex:1;margin-top:6px}
+.tl-body{flex:1;padding-top:4px}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.tl-meta{font-size:11px;color:var(--text2);display:flex;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.tl-val{font-size:13px;font-weight:500;color:var(--gold);margin-bottom:8px}
+.tl-note{font-size:11px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:8px}
+.tl-photos{display:flex;gap:6px}
+.photo-thumb{width:56px;height:40px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text2)}
+
+/* ── FINANCEIRO ── */
+.fin-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.fin-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.fin-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.fin-val{font-size:22px;font-weight:600;margin-bottom:4px}
+.fin-sub{font-size:11px;color:var(--text2)}
+.mini-chart{height:60px;background:var(--bg3);border-radius:8px;margin-top:10px;display:flex;align-items:flex-end;padding:8px 8px 0;gap:4px;overflow:hidden}
+.mini-bar{border-radius:3px 3px 0 0;min-width:12px;flex:1;background:rgba(59,130,246,.4)}
+.mini-bar.current{background:var(--accent)}
+
+/* ── CLIENTES ── */
+.client-item{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+.client-item+.client-item{margin-top:8px}
+.client-left{display:flex;align-items:center;gap:12px}
+.client-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.client-info{font-size:11px;color:var(--text2)}
+.client-right{display:flex;align-items:center;gap:10px}
+
+/* ── PERFIL ── */
+.profile-header{display:flex;align-items:center;gap:16px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin-bottom:16px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.profile-field{margin-bottom:14px}
+.profile-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:5px}
+.profile-val{font-size:13px;color:var(--text);padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+.payment-methods{display:flex;flex-wrap:wrap;gap:12px;margin-top:0}
+.payment-card{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+.payment-add{display:flex;align-items:center;gap:8px;padding:10px 16px;border:1px dashed var(--border2);border-radius:8px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;transition:.15s}
+.payment-add:hover{opacity:.7}
+
+/* ── AGENDAMENTOS LAYOUT ── */
+.agend-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:#fff"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">AutoDetail</div>
+        <div class="logo-sub">Premium Studio</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" onclick="show('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" onclick="show('agendamentos',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agendamentos
+        <span class="nav-badge">2</span>
+      </button>
+      <button class="nav-item" onclick="show('servicos',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Serviços
+      </button>
+      <button class="nav-item" onclick="show('veiculos',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+        Veículos
+      </button>
+      <button class="nav-item" onclick="show('historico',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4"/><polyline points="3 16 3 11 8 11"/></svg>
+        Histórico
+      </button>
+
+      <div class="nav-section-label">Gestão</div>
+
+      <button class="nav-item" onclick="show('financeiro',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Financeiro
+      </button>
+      <button class="nav-item" onclick="show('clientes',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clientes
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="user-btn" onclick="show('perfil', document.querySelector('.nav-item.active'))">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="user-name">Ricardo Costa</div>
+          <div class="user-plan">★ Plano Gold</div>
+        </div>
+        <svg style="margin-left:auto;color:var(--text2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="page-sub" id="page-sub">Visão geral da sua conta</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="show('agendamentos', document.querySelectorAll('.nav-item')[1])">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Agendamento
+        </button>
+        <button class="btn btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--text2)"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ════ DASHBOARD ════ -->
+      <div id="s-dashboard" class="screen active">
+        <div style="margin-bottom:20px">
+          <h1 style="font-size:22px;font-weight:600;margin-bottom:4px">Olá, Ricardo 👋</h1>
+          <p style="color:var(--text2);font-size:13px">Bem-vindo ao seu painel premium. Aqui está um resumo da sua conta.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon ic-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <div class="stat-label">Serviços realizados</div>
+            <div class="stat-value">48</div>
+            <div class="stat-sub" style="color:var(--success)">↑ +3 este mês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon ic-gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+            </div>
+            <div class="stat-label">Veículos</div>
+            <div class="stat-value">3</div>
+            <div class="stat-sub">Cadastrados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon ic-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="stat-label">Próximos agend.</div>
+            <div class="stat-value">2</div>
+            <div class="stat-sub" style="color:var(--success)">Esta semana</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon ic-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="stat-label">Gasto no mês</div>
+            <div class="stat-value" style="font-size:18px">R$1.240</div>
+            <div class="stat-sub" style="color:var(--success)">↑ R$240 vs anterior</div>
+          </div>
+        </div>
+
+        <div class="next-appt" onclick="show('agendamentos', document.querySelectorAll('.nav-item')[1])">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+            <div>
+              <div class="appt-label">Próximo agendamento</div>
+              <div class="appt-service">Polimento Técnico Completo</div>
+              <div class="appt-vehicle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+                BMW 320i · 2021 · Prata
+              </div>
+            </div>
+            <span class="badge badge-success">Confirmado</span>
+          </div>
+          <div class="appt-details">
+            <div class="appt-detail"><div class="detail-label">Data</div><div class="detail-value">12 Jun, 2026</div></div>
+            <div class="appt-detail"><div class="detail-label">Horário</div><div class="detail-value">09:30</div></div>
+            <div class="appt-detail"><div class="detail-label">Profissional</div><div class="detail-value">Lucas Mendes</div></div>
+            <div class="appt-detail"><div class="detail-label">Valor</div><div class="detail-value" style="color:var(--gold)">R$ 480,00</div></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();show('agendamentos',document.querySelectorAll('.nav-item')[1])">
+            Ver Detalhes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="dash-row">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Serviços Recentes</div><div class="card-sub">Últimos 30 dias</div></div>
+              <button class="btn btn-sm" onclick="show('historico',document.querySelectorAll('.nav-item')[4])">Ver todos</button>
+            </div>
+            <div class="svc-list">
+              <div class="svc-item">
+                <div class="svc-left"><div class="svc-dot" style="background:var(--success)"></div><div><div class="svc-name">Lavagem Técnica Premium</div><div class="svc-date">05 Jun, 2026</div></div></div>
+                <div class="svc-right"><span class="badge badge-success">Concluído</span><span class="svc-val">R$ 120</span></div>
+              </div>
+              <div class="svc-item">
+                <div class="svc-left"><div class="svc-dot" style="background:var(--gold)"></div><div><div class="svc-name">Vitrificação de Pintura</div><div class="svc-date">28 Mai, 2026</div></div></div>
+                <div class="svc-right"><span class="badge badge-success">Concluído</span><span class="svc-val">R$ 890</span></div>
+              </div>
+              <div class="svc-item">
+                <div class="svc-left"><div class="svc-dot" style="background:var(--accent)"></div><div><div class="svc-name">Higienização Interna</div><div class="svc-date">15 Mai, 2026</div></div></div>
+                <div class="svc-right"><span class="badge badge-success">Concluído</span><span class="svc-val">R$ 220</span></div>
+              </div>
+              <div class="svc-item">
+                <div class="svc-left"><div class="svc-dot" style="background:var(--warn)"></div><div><div class="svc-name">Cristalização de Vidros</div><div class="svc-date">02 Jun, 2026</div></div></div>
+                <div class="svc-right"><span class="badge badge-warning">Pendente</span><span class="svc-val">R$ 180</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="loyalty-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div class="loy-title">⭐ Plano Fidelidade Gold</div>
+              <span class="badge badge-gold">Gold</span>
+            </div>
+            <div class="loy-sub">720 de 1.000 pontos para Platinum</div>
+            <div class="loy-bar-bg"><div class="loy-bar"></div></div>
+            <div class="loy-pts"><span>720 pts</span><span>1.000 pts</span></div>
+            <hr class="loy-divider">
+            <div class="loy-benefits-title">Benefícios ativos</div>
+            <div class="loy-benefit"><span class="check-icon">✓</span> 15% desconto em polimentos</div>
+            <div class="loy-benefit"><span class="check-icon">✓</span> Lavagem cortesia mensal</div>
+            <div class="loy-benefit"><span class="check-icon">✓</span> Atendimento prioritário</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ AGENDAMENTOS ════ -->
+      <div id="s-agendamentos" class="screen">
+        <div class="agend-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Novo Agendamento</div></div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">Serviço</label>
+              <select class="form-control">
+                <option>Polimento Técnico Completo</option>
+                <option>Lavagem Técnica Premium</option>
+                <option>Vitrificação de Pintura</option>
+                <option>Higienização Interna</option>
+                <option>Cristalização de Vidros</option>
+                <option>Revitalização de Plásticos</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Profissional</label>
+                <select class="form-control">
+                  <option>Lucas Mendes</option>
+                  <option>Rafael Silva</option>
+                  <option>Thiago Souza</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Veículo</label>
+                <select class="form-control">
+                  <option>BMW 320i 2021</option>
+                  <option>Honda Civic 2019</option>
+                  <option>Toyota Corolla 2023</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Horário disponível</label>
+              <div class="time-slots">
+                <div class="time-slot busy">08:00</div>
+                <div class="time-slot sel" onclick="selSlot(this)">09:30</div>
+                <div class="time-slot" onclick="selSlot(this)">10:00</div>
+                <div class="time-slot" onclick="selSlot(this)">11:30</div>
+                <div class="time-slot busy">13:00</div>
+                <div class="time-slot" onclick="selSlot(this)">14:00</div>
+                <div class="time-slot" onclick="selSlot(this)">15:30</div>
+                <div class="time-slot" onclick="selSlot(this)">16:00</div>
+              </div>
+            </div>
+            <hr class="form-divider">
+            <button class="btn btn-primary" style="width:100%;justify-content:center">Confirmar Agendamento</button>
+          </div>
+
+          <div class="card">
+            <div class="cal-nav">
+              <div class="cal-month">Junho 2026</div>
+              <div class="cal-btns">
+                <button class="btn btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" style="color:var(--text2)"><polyline points="15 18 9 12 15 6"/></svg></button>
+                <button class="btn btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" style="color:var(--text2)"><polyline points="9 18 15 12 9 6"/></svg></button>
+              </div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-head">Dom</div><div class="cal-head">Seg</div><div class="cal-head">Ter</div>
+              <div class="cal-head">Qua</div><div class="cal-head">Qui</div><div class="cal-head">Sex</div><div class="cal-head">Sáb</div>
+              <div class="cal-day empty">-</div><div class="cal-day empty">-</div><div class="cal-day empty">-</div>
+              <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div>
+              <div class="cal-day">5</div><div class="cal-day has-appt">6</div><div class="cal-day">7</div>
+              <div class="cal-day">8</div><div class="cal-day today">9</div><div class="cal-day has-appt">10</div><div class="cal-day">11</div>
+              <div class="cal-day has-appt">12</div><div class="cal-day">13</div><div class="cal-day">14</div>
+              <div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day has-appt">17</div><div class="cal-day">18</div>
+              <div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day">21</div>
+              <div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div>
+              <div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div>
+              <div class="cal-day">29</div><div class="cal-day">30</div>
+            </div>
+            <div class="cal-legend">
+              <div class="cal-leg-item"><div class="leg-dot" style="background:var(--accent)"></div> Agendado</div>
+              <div class="cal-leg-item"><div class="leg-dot" style="background:var(--accent);border:2px solid #fff3"></div> Hoje</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SERVIÇOS ════ -->
+      <div id="s-servicos" class="screen">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Catálogo de Serviços</div><div class="card-sub">Selecione um serviço para agendar</div></div></div>
+          <div class="svc-catalog">
+            <button class="svc-cat-item selected" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:var(--accent2)">💧</span>
+              <div class="svc-cat-name">Lavagem Técnica</div>
+              <div class="svc-cat-desc">Processo premium com pH neutro</div>
+              <div class="svc-cat-price">R$ 120</div>
+            </button>
+            <button class="svc-cat-item" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:var(--warn)">☀️</span>
+              <div class="svc-cat-name">Polimento Comercial</div>
+              <div class="svc-cat-desc">Acabamento espelhado acessível</div>
+              <div class="svc-cat-price">R$ 280</div>
+            </button>
+            <button class="svc-cat-item" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:var(--gold)">✨</span>
+              <div class="svc-cat-name">Polimento Técnico</div>
+              <div class="svc-cat-desc">Remoção de riscos profunda</div>
+              <div class="svc-cat-price">R$ 480</div>
+            </button>
+            <button class="svc-cat-item" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:#c084fc">🛡️</span>
+              <div class="svc-cat-name">Vitrificação</div>
+              <div class="svc-cat-desc">Proteção duradoura cerâmica</div>
+              <div class="svc-cat-price">R$ 890</div>
+            </button>
+            <button class="svc-cat-item" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:var(--success)">🏠</span>
+              <div class="svc-cat-name">Higienização Interna</div>
+              <div class="svc-cat-desc">Sanitização e odorização</div>
+              <div class="svc-cat-price">R$ 220</div>
+            </button>
+            <button class="svc-cat-item" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:#22d3ee">👁️</span>
+              <div class="svc-cat-name">Cristalização Vidros</div>
+              <div class="svc-cat-desc">Visibilidade e proteção UV</div>
+              <div class="svc-cat-price">R$ 180</div>
+            </button>
+            <button class="svc-cat-item" onclick="selSvc(this)">
+              <span class="svc-cat-icon" style="color:var(--warn)">🔄</span>
+              <div class="svc-cat-name">Revitalização Plásticos</div>
+              <div class="svc-cat-desc">Restaura cor e aparência</div>
+              <div class="svc-cat-price">R$ 150</div>
+            </button>
+          </div>
+          <div class="svc-selected-bar">
+            <div>
+              <div id="svc-sel-name" style="font-size:13px;font-weight:600">Selecionado: Lavagem Técnica</div>
+              <div id="svc-sel-price" style="font-size:12px;color:var(--text2);margin-top:2px">Valor: <span style="color:var(--gold)">R$ 120</span></div>
+            </div>
+            <button class="btn btn-primary btn-sm">Agendar este serviço</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ VEÍCULOS ════ -->
+      <div id="s-veiculos" class="screen">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Cadastrar Veículo
+          </button>
+        </div>
+        <div class="veh-grid">
+          <div class="veh-card">
+            <div class="veh-img">🚗</div>
+            <div class="veh-body">
+              <div class="veh-name">BMW 320i</div>
+              <div class="veh-plate">ABC-1D23</div>
+              <div class="veh-tags">
+                <span class="veh-tag">2021</span>
+                <span class="veh-tag">Prata</span>
+                <span class="veh-tag">42.300 km</span>
+              </div>
+            </div>
+          </div>
+          <div class="veh-card">
+            <div class="veh-img">🚙</div>
+            <div class="veh-body">
+              <div class="veh-name">Honda Civic</div>
+              <div class="veh-plate">XYZ-5E67</div>
+              <div class="veh-tags">
+                <span class="veh-tag">2019</span>
+                <span class="veh-tag">Preto</span>
+                <span class="veh-tag">78.100 km</span>
+              </div>
+            </div>
+          </div>
+          <div class="veh-card">
+            <div class="veh-img">🚐</div>
+            <div class="veh-body">
+              <div class="veh-name">Toyota Corolla</div>
+              <div class="veh-plate">DEF-9G01</div>
+              <div class="veh-tags">
+                <span class="veh-tag">2023</span>
+                <span class="veh-tag">Branco</span>
+                <span class="veh-tag">12.500 km</span>
+              </div>
+            </div>
+          </div>
+          <button class="veh-add">
+            <div class="veh-add-inner">
+              <span>＋</span>
+              <small>Adicionar veículo</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ════ HISTÓRICO ════ -->
+      <div id="s-historico" class="screen">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Timeline de Serviços</div><div class="card-sub">Histórico completo</div></div></div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot tl-dot-blue">✨</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-title">Polimento Técnico Completo</div>
+                <div class="tl-meta"><span>05 Jun 2026</span><span>Lucas Mendes</span><span>BMW 320i</span></div>
+                <div class="tl-val">R$ 480,00</div>
+                <div class="tl-note">Remoção completa de micro-riscos. Pintura restaurada a 95% da condição original. Aplicado protetor temporário.</div>
+                <div class="tl-photos"><div class="photo-thumb">🖼️</div><div class="photo-thumb">🖼️</div></div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot tl-dot-gold">🛡️</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-title">Vitrificação de Pintura</div>
+                <div class="tl-meta"><span>28 Mai 2026</span><span>Rafael Silva</span><span>Honda Civic</span></div>
+                <div class="tl-val">R$ 890,00</div>
+                <div class="tl-note">Camada cerâmica SiO2 aplicada com validade de 36 meses. Nível 9H de dureza.</div>
+                <div class="tl-photos"><div class="photo-thumb">🖼️</div><div class="photo-thumb">🖼️</div></div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot tl-dot-green">💧</div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-title">Lavagem Técnica Premium</div>
+                <div class="tl-meta"><span>15 Mai 2026</span><span>Thiago Souza</span><span>Toyota Corolla</span></div>
+                <div class="tl-val">R$ 120,00</div>
+                <div class="tl-note">Lavagem pH neutro com secagem técnica e aplicação de selante em pneus.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ FINANCEIRO ════ -->
+      <div id="s-financeiro" class="screen">
+        <div class="fin-cards">
+          <div class="fin-card">
+            <div class="fin-label">Total gasto 2026</div>
+            <div class="fin-val">R$ 4.820</div>
+            <div class="fin-sub" style="color:var(--success)">↑ 18% vs 2025</div>
+            <div class="mini-chart">
+              <div class="mini-bar" style="height:40%"></div>
+              <div class="mini-bar" style="height:55%"></div>
+              <div class="mini-bar" style="height:35%"></div>
+              <div class="mini-bar" style="height:70%"></div>
+              <div class="mini-bar" style="height:60%"></div>
+              <div class="mini-bar current" style="height:85%"></div>
+            </div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-label">Serviços pagos</div>
+            <div class="fin-val" style="color:var(--success)">14</div>
+            <div class="fin-sub">R$ 4.640 pagos</div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-label">Pendente</div>
+            <div class="fin-val" style="color:var(--warn)">2</div>
+            <div class="fin-sub">R$ 180 a pagar</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Faturas Recentes</div></div>
+          <div class="svc-list">
+            <div class="svc-item">
+              <div class="svc-left">
+                <span style="font-size:15px;color:var(--text2)">🧾</span>
+                <div><div class="svc-name">Fat. #2026-048 — Polimento Técnico</div><div class="svc-date">05 Jun 2026</div></div>
+              </div>
+              <div class="svc-right"><span class="badge badge-success">Pago</span><span class="svc-val">R$ 480</span><button class="btn btn-sm">⬇</button></div>
+            </div>
+            <div class="svc-item">
+              <div class="svc-left">
+                <span style="font-size:15px;color:var(--text2)">🧾</span>
+                <div><div class="svc-name">Fat. #2026-039 — Vitrificação</div><div class="svc-date">28 Mai 2026</div></div>
+              </div>
+              <div class="svc-right"><span class="badge badge-success">Pago</span><span class="svc-val">R$ 890</span><button class="btn btn-sm">⬇</button></div>
+            </div>
+            <div class="svc-item">
+              <div class="svc-left">
+                <span style="font-size:15px;color:var(--text2)">🧾</span>
+                <div><div class="svc-name">Fat. #2026-041 — Cristalização</div><div class="svc-date">02 Jun 2026</div></div>
+              </div>
+              <div class="svc-right"><span class="badge badge-warning">Pendente</span><span class="svc-val">R$ 180</span><button class="btn btn-primary btn-sm">Pagar</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ CLIENTES ════ -->
+      <div id="s-clientes" class="screen">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-size:13px;color:var(--text2)">3 clientes cadastrados</div>
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Cliente
+          </button>
+        </div>
+        <div class="card">
+          <div class="client-item">
+            <div class="client-left">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px">RC</div>
+              <div><div class="client-name">Ricardo Costa</div><div class="client-info">ricardo@email.com · (11) 99999-8888</div></div>
+            </div>
+            <div class="client-right">
+              <span class="badge badge-gold">Gold</span>
+              <button class="btn btn-sm" onclick="show('perfil',document.querySelectorAll('.nav-item')[6])">Ver perfil</button>
+            </div>
+          </div>
+          <div class="client-item">
+            <div class="client-left">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px;background:linear-gradient(135deg,#0f6e56,#1d9e75)">AS</div>
+              <div><div class="client-name">Ana Souza</div><div class="client-info">ana@email.com · (11) 97777-6666</div></div>
+            </div>
+            <div class="client-right">
+              <span class="badge badge-gray">Silver</span>
+              <button class="btn btn-sm">Ver perfil</button>
+            </div>
+          </div>
+          <div class="client-item">
+            <div class="client-left">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px;background:linear-gradient(135deg,#7c2d12,#b45309)">MO</div>
+              <div><div class="client-name">Marcos Oliveira</div><div class="client-info">marcos@email.com · (11) 95555-4444</div></div>
+            </div>
+            <div class="client-right">
+              <span class="badge badge-gold">Gold</span>
+              <button class="btn btn-sm">Ver perfil</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ PERFIL ════ -->
+      <div id="s-perfil" class="screen">
+        <div class="profile-header">
+          <div class="avatar avatar-lg">RC</div>
+          <div style="flex:1">
+            <div style="font-size:18px;font-weight:600;margin-bottom:3px">Ricardo Costa</div>
+            <div style="font-size:12px;color:var(--gold)">★ Plano Gold · Membro desde Janeiro 2023</div>
+          </div>
+          <button class="btn btn-gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar perfil
+          </button>
+        </div>
+
+        <div class="profile-grid">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:16px">Dados Pessoais</div>
+            <div class="profile-field"><span class="profile-label">Nome completo</span><div class="profile-val">Ricardo Costa Mendonça</div></div>
+            <div class="profile-field"><span class="profile-label">E-mail</span><div class="profile-val">ricardo@email.com</div></div>
+            <div class="profile-field"><span class="profile-label">Telefone</span><div class="profile-val">(11) 99999-8888</div></div>
+            <div class="profile-field" style="margin-bottom:0"><span class="profile-label">CPF</span><div class="profile-val">***.456.789-**</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:16px">Endereço</div>
+            <div class="profile-field"><span class="profile-label">Rua</span><div class="profile-val">Rua das Flores, 1245</div></div>
+            <div class="profile-field"><span class="profile-label">Bairro</span><div class="profile-val">Jardim América</div></div>
+            <div class="profile-field"><span class="profile-label">Cidade</span><div class="profile-val">São Paulo, SP</div></div>
+            <div class="profile-field" style="margin-bottom:0"><span class="profile-label">CEP</span><div class="profile-val">01234-567</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Métodos de Pagamento</div>
+          <div class="payment-methods">
+            <div class="payment-card">
+              <span style="font-size:18px">💳</span>
+              <div>
+                <div style="font-size:12px;font-weight:500">Mastercard ···· 4521</div>
+                <div style="font-size:11px;color:var(--text2)">Vence 08/27 · Principal</div>
+              </div>
+            </div>
+            <button class="payment-add">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar cartão
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+const titles = {
+  dashboard: ['Dashboard','Visão geral da sua conta'],
+  agendamentos: ['Agendamentos','Gerencie seus horários'],
+  servicos: ['Serviços','Catálogo de serviços disponíveis'],
+  veiculos: ['Veículos','Seus veículos cadastrados'],
+  historico: ['Histórico','Timeline completa de serviços'],
+  financeiro: ['Financeiro','Relatório financeiro'],
+  clientes: ['Clientes','Base de clientes cadastrados'],
+  perfil: ['Meu Perfil','Dados da sua conta'],
+};
+
+function show(id, navEl) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl && navEl.classList && navEl.classList.contains('nav-item')) navEl.classList.add('active');
+  const t = titles[id];
+  if (t) {
+    document.getElementById('page-title').textContent = t[0];
+    document.getElementById('page-sub').textContent = t[1];
+  }
+}
+
+function selSlot(el) {
+  if (el.classList.contains('busy')) return;
+  document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function selSvc(el) {
+  document.querySelectorAll('.svc-cat-item').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  const name = el.querySelector('.svc-cat-name').textContent;
+  const price = el.querySelector('.svc-cat-price').textContent;
+  document.getElementById('svc-sel-name').textContent = 'Selecionado: ' + name;
+  document.getElementById('svc-sel-price').innerHTML = 'Valor: <span style="color:var(--gold)">' + price + '</span>';
+}
+</script>
+</body>
+</html>
